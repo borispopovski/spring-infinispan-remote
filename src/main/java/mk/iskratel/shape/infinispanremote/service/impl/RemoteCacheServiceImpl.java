@@ -3,6 +3,7 @@ package mk.iskratel.shape.infinispanremote.service.impl;
 import mk.iskratel.shape.infinispanremote.service.IRemoteCacheService;
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,8 @@ import java.util.UUID;
 @Service
 public class RemoteCacheServiceImpl implements IRemoteCacheService {
 
-  private static final String CACHE_NAME = "test_cache";
+  @Value("${cache.name}")
+  private String cacheName;
 
   private RemoteCacheManager remoteCacheManager;
 
@@ -21,16 +23,16 @@ public class RemoteCacheServiceImpl implements IRemoteCacheService {
   }
 
   @Override
-  @Cacheable(value = "test_cache", key = "#id", unless = "#result==null")
+  @Cacheable(value = "test-darko", key = "#id", unless = "#result==null")
   public String getName(String id) {
-    return remoteCacheManager.getCache(CACHE_NAME).get(id).toString();
+    return remoteCacheManager.getCache(cacheName).get(id).toString();
   }
 
   @Override
-  @CachePut(value = "test_cache", key = "#id", condition="#id != null")
+  @CachePut(value = "test-darko", key = "#id", condition="#id != null")
   public void createName(String name) {
     String id = UUID.randomUUID().toString();
-    RemoteCache<String, String> cache = remoteCacheManager.getCache(CACHE_NAME);
+    RemoteCache<String, String> cache = remoteCacheManager.getCache(cacheName);
     cache.put(id, name);
   }
 
